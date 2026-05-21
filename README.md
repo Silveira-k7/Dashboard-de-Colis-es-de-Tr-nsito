@@ -6,7 +6,7 @@ Projeto final da disciplina para análise exploratória e construção de dois d
 
 ## Tema
 
-Colisões de trânsitom com foco em  gravidade, localização e comparação entre grupos.
+Colisões de trânsito com foco em  gravidade, localização e comparação entre grupos.
 
 ## Estrutura do projeto
 
@@ -16,7 +16,8 @@ Colisões de trânsitom com foco em  gravidade, localização e comparação ent
 
 ## Fonte de dados
 A fote de bados foram coletadas do PRF:
-https://www.gov.br/prf/pt-br/acesso-a-informacao/dados-abertos/dados-abertos-da-prf
+
+`https://www.gov.br/prf/pt-br/acesso-a-informacao/dados-abertos/dados-abertos-da-prf`
 
 Baixadas 3 csv:
 Documento CSV de Acidentes 2026 (Agrupados por ocorrência)
