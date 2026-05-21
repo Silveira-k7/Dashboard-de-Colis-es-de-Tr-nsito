@@ -1,0 +1,62 @@
+from __future__ import annotations
+
+import pandas as pd
+
+
+def build_kpis(frame: pd.DataFrame) -> dict[str, float]:
+    total = len(frame)
+    fatalities = int(frame["fatalities"].fillna(0).sum())
+    injured = int(frame["injured"].fillna(0).sum())
+    severe = int(frame["severity"].isin(["serious", "fatal"]).sum())
+    fatal_rate = (fatalities / total * 1000) if total else 0.0
+    return {
+        "total_accidents": total,
+        "fatalities": fatalities,
+        "injured": injured,
+        "severe_share": severe / total if total else 0.0,
+        "fatal_rate_per_thousand": fatal_rate,
+    }
+
+
+def monthly_trend(frame: pd.DataFrame) -> pd.DataFrame:
+    data = (
+        frame.dropna(subset=["occurred_at"])
+        .assign(month_period=lambda d: d["occurred_at"].dt.to_period("M").dt.to_timestamp())
+        .groupby("month_period", as_index=False)
+        .agg(accidents=("occurred_at", "size"), fatalities=("fatalities", "sum"), injured=("injured", "sum"))
+    )
+    return data.sort_values("month_period")
+
+
+def by_state(frame: pd.DataFrame) -> pd.DataFrame:
+    return (
+        frame.groupby("state", as_index=False)
+        .agg(accidents=("state", "size"), fatalities=("fatalities", "sum"), injured=("injured", "sum"))
+        .sort_values("accidents", ascending=False)
+    )
+
+
+def by_accident_type(frame: pd.DataFrame) -> pd.DataFrame:
+    return (
+        frame.groupby("accident_type", as_index=False)
+        .agg(accidents=("accident_type", "size"), fatalities=("fatalities", "sum"), injured=("injured", "sum"))
+        .sort_values("accidents", ascending=False)
+    )
+
+
+def by_period(frame: pd.DataFrame) -> pd.DataFrame:
+    order = ["Madrugada", "Manha", "Tarde", "Noite", "Fim de noite"]
+    data = (
+        frame.groupby("time_period", as_index=False, observed=False)
+        .agg(accidents=("time_period", "size"), fatalities=("fatalities", "sum"), injured=("injured", "sum"))
+    )
+    data["time_period"] = pd.Categorical(data["time_period"], categories=order, ordered=True)
+    return data.sort_values("time_period")
+
+
+def weekend_comparison(frame: pd.DataFrame) -> pd.DataFrame:
+    return (
+        frame.assign(day_type=lambda d: d["is_weekend"].map({True: "Fim de semana", False: "Dias uteis"}))
+        .groupby("day_type", as_index=False)
+        .agg(accidents=("day_type", "size"), fatalities=("fatalities", "sum"), injured=("injured", "sum"))
+    )
